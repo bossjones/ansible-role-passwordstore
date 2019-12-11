@@ -27,6 +27,9 @@
     control_machine_ip: "{{ hostvars['localhost'].ansible_default_ipv4.address }}"
     hide_sensitive_logs: false
 
+  # SOURCE: https://benincosa.com/?p=3235
+  # SOURCE: https://jimsaunders.net/2017/02/18/setting-up-the-pass-password-manager.html
   roles:
     - ../ansible-role-knownhosts
+    - ../ansible-gpgkey_generate
     - ../ansible-role-passwordstore
