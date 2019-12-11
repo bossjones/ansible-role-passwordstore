@@ -1,54 +1,49 @@
 # -*- coding: utf-8 -*-
 # tasks for  ansible-role-passwordstore
 ---
-- name: Install/Setup passwordstore
+- name: install apt packages
   package:
-    name: '{{ item }}'
-    state: latest
-  with_items:
-    - passwordstore
-    - xclip
-  when: ansible_os_family == "Debian"
-
-- name: Clone passwordstore config
-  git:
-    repo: https://github.com/gpakosz/.passwordstore
-    dest: "{{item.dir}}/.passwordstore"
-    version: "master"
+    name:
+      - expect  # for automatic ssh key unlocking
+      - gnupg2  # I want to be able to use gpg2 command for compatibility
+      - git
+      - xclip  # for putting password in clipboard
+      - pinentry-tty  # for unlocking keys in agent without gui
+      - pwgen  # password generator
   become: yes
-  become_user: "{{item.user}}"
-  with_items: "{{bossjones__passwordstore__path_to_passwordstore_config}}"
 
-- name: Clone powerline fonts
-  git:
-    repo: https://github.com/powerline/fonts.git
-    dest: "{{item.dir}}/fonts"
-    version: "master"
-    depth: 1
-  become: yes
-  become_user: "{{item.user}}"
-  with_items: "{{bossjones__passwordstore__path_to_passwordstore_config}}"
+- name: ensure directories exist
+  file:
+    dest: "{{ ansible_env.HOME }}/{{ item }}"
+    state: directory
+    mode: 0700
+  loop:
+    - .ssh
+    # - .ssh/keys
+    - .gnupg
 
-- name: bootstrap passwordstore.conf
-  shell: |
-            ln -s -f .passwordstore/.passwordstore.conf
-            cp .passwordstore/.passwordstore.conf.local .
-            chdir="{{item.dir}}"
-  become: yes
-  become_user: "{{item.user}}"
-  with_items: "{{bossjones__passwordstore__path_to_passwordstore_config}}"
+# - name: copy GPG key for password store
+#   copy:
+#     dest: "{{ ansible_env.HOME }}/.gnupg/{{ key_filename }}"
+#     content: "{{ lookup('passwordstore', 'personal-gpg-key returnall=true') }}"
+#     mode: 0600
+#   no_log: "{{ hide_sensitive_logs }}"
+#   register: gpg_key_status
 
-- name: Install powerline fonts
-  shell: |
-            # install
-            cd fonts
-            ./install.sh
-            # clean-up a bit
-            cd ..
-            rm -rf fonts
-            chdir="{{item.dir}}"
-  become: yes
-  become_user: "{{item.user}}"
-  with_items: "{{bossjones__passwordstore__path_to_passwordstore_config}}"
+# - name: import gpg key
+#   command: gpg2 --batch --import {{ ansible_env.HOME }}/.gnupg/{{ key_filename }}
+#   when: gpg_key_status.changed
 
+# - name: copy GPG trust database so that keys are trusted
+#   copy:
+#     # note that in src we want the HOME of ansible controller user
+#     src: "{{ lookup('env', 'HOME') }}/.gnupg/trustdb.gpg"
+#     dest: "{{ ansible_env.HOME }}/.gnupg/trustdb.gpg"
+#     mode: 0600
+
+# - name: configure git user email
+#   git_config:
+#     name: user.email
+#     value: "{{ bossjones__passwordstore__git_config_email }}"
+#     path: "{{ passwordstore_path }}"
 
