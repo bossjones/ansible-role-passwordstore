@@ -9,6 +9,7 @@
 #     - ../ansible-role-passwordstore
 
 # SOURCE: Inspiration - https://github.com/jan-warchol/ansible-workstation-setup/blob/a7bc1045882a4ab1cc35530083cd10db74c901dd/cli-setup-secrets.yml
+# SOURCE: https://www.bootc.net/archives/2013/06/09/my-perfect-gnupg-ssh-agent-setup/
 
 - name: get information about ansible control machine
   hosts: localhost
@@ -52,8 +53,9 @@
   # SOURCE: https://jimsaunders.net/2017/02/18/setting-up-the-pass-password-manager.html
   roles:
     - role: ../ansible-gpgkey_generate
+      gpg_generator_user: "{{ bossjones__passwordstore__user }}"
       gpg_user: "{{ bossjones__passwordstore__user }}"
-      gpg_realname: "GPG Ansible user"
+      gpg_realname: "GPG {{ bossjones__passwordstore__user }} user"
       gpg_useremail: "{{ bossjones__passwordstore__user }}@localhost"
       gpg_pubkeyfile: "{{ bossjones__passwordstore__user }}.pub"
       gpg_privkeyfile: "{{ bossjones__passwordstore__user }}.priv"
@@ -103,3 +105,6 @@
   roles:
     - ../ansible-role-knownhosts
     - ../ansible-role-passwordstore
+
+
+  # NOTE: don't forget to cat /etc/X11/Xsession.d/90gpg-agent
