@@ -1,0 +1,7 @@
+# -*- coding: utf-8 -*-
+# default vars for  ansible-role-passwordstore
+---
+# Suggested ansible variable namespace: behance__oh__my__bossjones__passwordstore___
+
+bossjones__passwordstore__path_to_passwordstore_config:
+  - { user: "vagrant", dir: "/home/vagrant" }

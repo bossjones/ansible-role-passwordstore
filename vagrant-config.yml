@@ -1,0 +1,25 @@
+# https://gist.github.com/gnarf/b103e77f37236ca72d8e
+# SOURCE: \cat roles/*/vagrant-config.yml | pbcopy
+:vms:
+  ubuntu-passwordstore:
+    :hostname: "ubuntu-passwordstore"
+    :name: "ubuntu-passwordstore"
+    :type: "master"
+    :box: "ubuntu/bionic64"
+    :eth1: "192.168.10.45"
+    :ip: "192.168.10.45"
+    :mem: 2048
+    :ram: 2048
+    :cpu: 2
+    :id: 10
+  fedora-passwordstore:
+    :hostname: "fedora-passwordstore"
+    :name: "fedora-passwordstore"
+    :type: "master"
+    :box: "fedora/29-cloud-base"
+    :eth1: "192.168.10.55"
+    :ip: "192.168.10.55"
+    :mem: 2048
+    :ram: 2048
+    :cpu: 2
+    :id: 11

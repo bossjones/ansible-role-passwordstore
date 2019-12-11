@@ -1,0 +1,10 @@
+---
+# sudo ansible-playbook -i "localhost," -c local playbook.yml
+# sudo ansible-playbook -i "localhost," -c local playbook.yml --extra-vars="bossjones__passwordstore__user=$(whoami)"
+# sudo ansible-playbook --ask-become-pass --check -i "localhost," -c local playbook.yml --extra-vars="bossjones__passwordstore__user=$(whoami)"
+- hosts: localhost
+  connection: local
+  become: true
+  roles:
+    - ../ansible-role-passwordstore
+

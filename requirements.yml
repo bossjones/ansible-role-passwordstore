@@ -1,0 +1,3 @@
+---
+- src: https://github.com/bossjones/boss-ansible-role-debug
+# https://github.com/suzuki-shunsuke/ansible-gvm
