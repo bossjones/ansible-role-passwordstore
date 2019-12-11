@@ -1,7 +1,7 @@
 ---
-# sudo ansible-playbook -i "localhost," -c local playbook.yml
-# sudo ansible-playbook -i "localhost," -c local playbook.yml --extra-vars="bossjones__passwordstore__user=$(whoami)"
-# sudo ansible-playbook --ask-become-pass --check -i "localhost," -c local playbook.yml --extra-vars="bossjones__passwordstore__user=$(whoami)"
+# ansible-playbook -i "localhost," -c local playbook.yml
+# ansible-playbook -i "localhost," -c local playbook.yml --extra-vars="bossjones__passwordstore__user=$(whoami)"
+# ansible-playbook --ask-become-pass --check -i "localhost," -c local playbook.yml --extra-vars="bossjones__passwordstore__user=$(whoami)"
 # - hosts: localhost
 #   connection: local
 #   become: true
@@ -27,9 +27,35 @@
     control_machine_ip: "{{ hostvars['localhost'].ansible_default_ipv4.address }}"
     hide_sensitive_logs: false
 
+  # pre_tasks:
+  #   # SOURCE: https://superuser.com/questions/624343/keep-gnupg-credentials-cached-for-entire-user-session
+  #   # SOURCE: https://superuser.com/questions/1172804/how-to-prevent-gpg-agent-from-timing-out-during-passphrase-collection?rq=1
+  #   - name: 'gpg-agent.conf'
+  #     copy:
+  #       dest: "{{ ansible_env.HOME }}/.gnupg/gpg-agent.conf"
+  #       content: |
+  #         default-cache-ttl 34560000
+  #         max-cache-ttl 34560000
+  #         pinentry-timeout 0
+  #         pinentry-program /usr/bin/pinentry-curses --timeout 0
+  #       mode: 0600
+  #     no_log: "{{ hide_sensitive_logs }}"
   # SOURCE: https://benincosa.com/?p=3235
   # SOURCE: https://jimsaunders.net/2017/02/18/setting-up-the-pass-password-manager.html
   roles:
     - ../ansible-role-knownhosts
-    - ../ansible-gpgkey_generate
+    - role: ../ansible-gpgkey_generate
+      gpg_user: "{{ ansible_ssh_user }}"
+      gpg_realname: "GPG Ansible user"
+      gpg_useremail: "{{ ansible_ssh_user }}@localhost"
+      gpg_pubkeyfile: "{{ ansible_ssh_user }}.pub"
+      gpg_privkeyfile: "{{ ansible_ssh_user }}.priv"
+      gpg_pubkeyfileexport: "{{ ansible_ssh_user }}.asc"
+      gpg_fingerprint: "{{ ansible_ssh_user }}-fingerprint"
+      gpg_keylength: 4096
+      gpg_subkeylength: 4096
+      gpg_expire: 0
+      gpg_passphrase: "{{ lookup('env','MY_GPG_PASSPHRASE') }}"
+      ## recover files on orchestrator?
+      gpg_pull: true
     - ../ansible-role-passwordstore
