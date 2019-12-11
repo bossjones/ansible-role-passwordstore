@@ -16,6 +16,56 @@
   become: true
   gather_facts: yes
 
+- name: Setup | gpg key generate and configure
+  become: true
+  hosts: localhost
+  connection: local
+
+  vars:
+    pass_gpg_key_fingerprint: "EC5E 11DD EF42 BF79 FBFA 4F4E FF6A DDEB B33A 5D2F"
+    key_filename: "GPG_key_{{ pass_gpg_key_fingerprint | replace(' ', '') }}.asc"
+    control_machine_ip: "{{ hostvars['localhost'].ansible_default_ipv4.address }}"
+    hide_sensitive_logs: false
+
+  # pre_tasks:
+  #   # SOURCE: https://superuser.com/questions/624343/keep-gnupg-credentials-cached-for-entire-user-session
+  #   # SOURCE: https://superuser.com/questions/1172804/how-to-prevent-gpg-agent-from-timing-out-during-passphrase-collection?rq=1
+  #   - name: 'gpg-agent.conf'
+  #     copy:
+  #       dest: "{{ ansible_env.HOME }}/.gnupg/gpg-agent.conf"
+  #       content: |
+  #############################################################
+  # SOURCE: https://benincosa.com/?p=3235
+  #############################################################
+  #         default-cache-ttl 600
+  #         pinentry-program /usr/local/bin/pinentry
+  #         no-grab
+  #         max-cache-ttl 172800
+  ##############################################################
+  #         default-cache-ttl 34560000
+  #         max-cache-ttl 34560000
+  #         pinentry-timeout 0
+  #         pinentry-program /usr/bin/pinentry-curses --timeout 0
+  #       mode: 0600
+  #     no_log: "{{ hide_sensitive_logs }}"
+  # SOURCE: https://benincosa.com/?p=3235
+  # SOURCE: https://jimsaunders.net/2017/02/18/setting-up-the-pass-password-manager.html
+  roles:
+    - role: ../ansible-gpgkey_generate
+      gpg_user: "{{ bossjones__passwordstore__user }}"
+      gpg_realname: "GPG Ansible user"
+      gpg_useremail: "{{ bossjones__passwordstore__user }}@localhost"
+      gpg_pubkeyfile: "{{ bossjones__passwordstore__user }}.pub"
+      gpg_privkeyfile: "{{ bossjones__passwordstore__user }}.priv"
+      gpg_pubkeyfileexport: "{{ bossjones__passwordstore__user }}.asc"
+      gpg_fingerprint: "{{ bossjones__passwordstore__user }}-fingerprint"
+      gpg_keylength: 4096
+      gpg_subkeylength: 4096
+      gpg_expire: 0
+      gpg_passphrase: "{{ lookup('env','MY_GPG_PASSPHRASE') }}"
+      ## recover files on orchestrator?
+      gpg_pull: false
+
 - name: setup password store
   # hosts: all
   hosts: localhost
@@ -34,6 +84,14 @@
   #     copy:
   #       dest: "{{ ansible_env.HOME }}/.gnupg/gpg-agent.conf"
   #       content: |
+  #############################################################
+  # SOURCE: https://benincosa.com/?p=3235
+  #############################################################
+  #         default-cache-ttl 600
+  #         pinentry-program /usr/local/bin/pinentry
+  #         no-grab
+  #         max-cache-ttl 172800
+  ##############################################################
   #         default-cache-ttl 34560000
   #         max-cache-ttl 34560000
   #         pinentry-timeout 0
@@ -44,18 +102,4 @@
   # SOURCE: https://jimsaunders.net/2017/02/18/setting-up-the-pass-password-manager.html
   roles:
     - ../ansible-role-knownhosts
-    - role: ../ansible-gpgkey_generate
-      gpg_user: "{{ ansible_ssh_user }}"
-      gpg_realname: "GPG Ansible user"
-      gpg_useremail: "{{ ansible_ssh_user }}@localhost"
-      gpg_pubkeyfile: "{{ ansible_ssh_user }}.pub"
-      gpg_privkeyfile: "{{ ansible_ssh_user }}.priv"
-      gpg_pubkeyfileexport: "{{ ansible_ssh_user }}.asc"
-      gpg_fingerprint: "{{ ansible_ssh_user }}-fingerprint"
-      gpg_keylength: 4096
-      gpg_subkeylength: 4096
-      gpg_expire: 0
-      gpg_passphrase: "{{ lookup('env','MY_GPG_PASSPHRASE') }}"
-      ## recover files on orchestrator?
-      gpg_pull: true
     - ../ansible-role-passwordstore
