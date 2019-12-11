@@ -2,9 +2,79 @@
 # sudo ansible-playbook -i "localhost," -c local playbook.yml
 # sudo ansible-playbook -i "localhost," -c local playbook.yml --extra-vars="bossjones__passwordstore__user=$(whoami)"
 # sudo ansible-playbook --ask-become-pass --check -i "localhost," -c local playbook.yml --extra-vars="bossjones__passwordstore__user=$(whoami)"
-- hosts: localhost
+# - hosts: localhost
+#   connection: local
+#   become: true
+#   roles:
+#     - ../ansible-role-passwordstore
+
+# SOURCE: Inspiration - https://github.com/jan-warchol/ansible-workstation-setup/blob/a7bc1045882a4ab1cc35530083cd10db74c901dd/cli-setup-secrets.yml
+
+- name: get information about ansible control machine
+  hosts: localhost
   connection: local
   become: true
+  gather_facts: yes
+
+- name: setup password store
+  # hosts: all
+  hosts: localhost
+  connection: local
+
+  vars:
+    pass_gpg_key_fingerprint: "EC5E 11DD EF42 BF79 FBFA 4F4E FF6A DDEB B33A 5D2F"
+    key_filename: "GPG_key_{{ pass_gpg_key_fingerprint | replace(' ', '') }}.asc"
+    control_machine_ip: "{{ hostvars['localhost'].ansible_default_ipv4.address }}"
+    hide_sensitive_logs: false
+
   roles:
+    - ../ansible-role-knownhosts
     - ../ansible-role-passwordstore
 
+  tasks:
+
+    - name: install apt packages
+      package:
+        name:
+          - expect  # for automatic ssh key unlocking
+          - gnupg2  # I want to be able to use gpg2 command for compatibility
+          - git
+          - xclip  # for putting password in clipboard
+          - pinentry-tty  # for unlocking keys in agent without gui
+          - pwgen  # password generator
+      become: yes
+
+    - name: ensure directories exist
+      file:
+        dest: "{{ ansible_env.HOME }}/{{ item }}"
+        state: directory
+        mode: 0700
+      loop:
+        - .ssh
+        # - .ssh/keys
+        - .gnupg
+
+    # - name: copy GPG key for password store
+    #   copy:
+    #     dest: "{{ ansible_env.HOME }}/.gnupg/{{ key_filename }}"
+    #     content: "{{ lookup('passwordstore', 'personal-gpg-key returnall=true') }}"
+    #     mode: 0600
+    #   no_log: "{{ hide_sensitive_logs }}"
+    #   register: gpg_key_status
+
+    # - name: import gpg key
+    #   command: gpg2 --batch --import {{ ansible_env.HOME }}/.gnupg/{{ key_filename }}
+    #   when: gpg_key_status.changed
+
+    # - name: copy GPG trust database so that keys are trusted
+    #   copy:
+    #     # note that in src we want the HOME of ansible controller user
+    #     src: "{{ lookup('env', 'HOME') }}/.gnupg/trustdb.gpg"
+    #     dest: "{{ ansible_env.HOME }}/.gnupg/trustdb.gpg"
+    #     mode: 0600
+
+    # - name: configure git user email
+    #   git_config:
+    #     name: user.email
+    #     value: "{{ bossjones__passwordstore__git_config_email }}"
+    #     path: "{{ passwordstore_path }}"
