@@ -279,3 +279,6 @@ gpr:
 
 rbenv:
 	bash scripts/rbenv.sh
+
+download-roles-force: ## download any ansible roles that we might need
+	ansible-galaxy install -r requirements.yml --force
