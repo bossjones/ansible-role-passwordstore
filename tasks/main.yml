@@ -10,6 +10,7 @@
       - xclip  # for putting password in clipboard
       - pinentry-tty  # for unlocking keys in agent without gui
       - pwgen  # password generator
+      - pass
   become: yes
 
 - name: ensure directories exist
@@ -47,3 +48,72 @@
 #     value: "{{ bossjones__passwordstore__git_config_email }}"
 #     path: "{{ passwordstore_path }}"
 
+# mkdir: created directory '/home/ubuntu/.password-store/'
+# Password store initialized for 56C83F52
+
+- block:
+    - name: "Check if ~/{{ bossjones__passwordstore__user }}-fingerprint file exists"
+      raw: "stat ~/{{ bossjones__passwordstore__user }}-fingerprint"
+      register: stat_user_fingerprint
+      changed_when: false
+  ignore_errors: yes
+
+- name: Generate secret key fingerprint file
+  shell: |
+    pass init "$(cat ~/{{ bossjones__passwordstore__user }}-fingerprint)"
+  args:
+    chdir: "~"
+    executable: /bin/bash
+  changed_when: false
+  register: gpg_user_fingerprint
+  become: yes
+  become_user: "{{ bossjones__passwordstore__user }}"
+  when: stat_user_fingerprint | failed
+
+# SOURCE: https://github.com/cortex/ripasso
+- name: install deps for ripasso | ncurses ui for pass
+  package:
+    name:
+      - cargo
+      - libgtk-3-dev
+      - qtdeclarative5-dev
+      - libqt5svg5-dev
+      - cmake
+      - libncurses-dev
+      - libssl-dev
+  become: yes
+
+- name: Clone ripasso
+  git:
+    repo: https://github.com/cortex/ripasso.git
+    dest: "~{{ bossjones__passwordstore__user }}/dev/ripasso"
+    version: "c3eec97893180115008b0c81b5f5248b9f891cd8"
+    force: yes
+  become: yes
+  become_user: "{{ bossjones__passwordstore__user }}"
+  register: res_ripasso
+
+- name: Cargo | build ripasso-cursive
+  shell: |
+    cargo build -p ripasso-cursive
+  args:
+    chdir: "~/dev/ripasso"
+    executable: /bin/bash
+  changed_when: false
+  register: res_ripasso_build
+  become: yes
+  become_user: "{{ bossjones__passwordstore__user }}"
+  # when: stat_user_fingerprint | failed
+
+- debug:
+    var: res_ripasso_build # not required. A variable name to debug.
+
+- name: passmenu | download
+  shell: |
+    curl -L 'https://git.zx2c4.com/password-store/plain/contrib/dmenu/passmenu' > /usr/local/bin/passmenu
+  args:
+    executable: /bin/bash
+  changed_when: false
+  become: yes
+  become_user: "{{ bossjones__passwordstore__user }}"
+  # when: stat_user_fingerprint | failed
