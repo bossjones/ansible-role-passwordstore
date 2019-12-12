@@ -144,6 +144,15 @@
       become: yes
       become_user: "{{ bossjones__passwordstore__user }}"
 
+    - name: gpg-agent | remember password longer
+      blockinfile:
+        path: "~{{ bossjones__passwordstore__user }}/.gnupg/gpg-agent.conf"
+        backup: yes
+        block: |
+          # remember the password longer (3 hours since last usage, 10 hours max)
+          default-cache-ttl 10800
+          max-cache-ttl 36000
+
   # NOTE: don't forget to cat /etc/X11/Xsession.d/90gpg-agent
 
 # SOURCE: https://github.com/jan-warchol/smart-bash-history/blob/master/fuzzy-search.sh
