@@ -7,5 +7,7 @@ bossjones__passwordstore__path_to_passwordstore_config:
   - { user: "vagrant", dir: "/home/vagrant" }
 
 bossjones__passwordstore__user: 'ubuntu'
+bossjones__passwordstore__configure_password_store_docker: False
 
 bossjones__passwordstore__git_config_email: jarvis@theblacktonystark.com
+

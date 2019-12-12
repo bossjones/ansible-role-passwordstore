@@ -117,3 +117,13 @@
   become: yes
   become_user: "{{ bossjones__passwordstore__user }}"
   # when: stat_user_fingerprint | failed
+
+- name: docker-credential-pass | download
+  shell: |
+    curl -L 'https://github.com/docker/docker-credential-helpers/releases/download/v0.6.3/docker-credential-pass-v0.6.3-amd64.tar.gz' > ~{{ bossjones__passwordstore__user }}/dev/tmp/docker-credential-pass-v0.6.3-amd64.tar.gz
+  args:
+    executable: /bin/bash
+  changed_when: false
+  become: yes
+  become_user: "{{ bossjones__passwordstore__user }}"
+  when: bossjones__passwordstore__configure_password_store_docker | bool
