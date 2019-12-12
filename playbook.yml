@@ -117,7 +117,8 @@
   # SOURCE: https://jimsaunders.net/2017/02/18/setting-up-the-pass-password-manager.html
   roles:
     - ../ansible-role-knownhosts
-    - ../ansible-role-passwordstore
+    - role: ../ansible-role-passwordstore
+      bossjones__passwordstore__configure_password_store_docker: True
 
   post_tasks:
 

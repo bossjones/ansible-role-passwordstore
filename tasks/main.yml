@@ -59,6 +59,13 @@
   changed_when: false
   ignore_errors: yes
 
+- name: "Check if ~/{{ bossjones__passwordstore__user }}/dev/ripasso/target/debug/ripasso-cursive file exists"
+  stat:
+    path: "~/{{ bossjones__passwordstore__user }}/dev/ripasso/target/debug/ripasso-cursive"
+  register: stat_ripasso_cursive_bin
+  changed_when: false
+  ignore_errors: yes
+
 - name: pass | init
   shell: "pass init \"$(cat ~/{{ bossjones__passwordstore__user }}-fingerprint)\""
   args:
@@ -109,10 +116,11 @@
   register: res_ripasso_build
   become: yes
   become_user: "{{ bossjones__passwordstore__user }}"
-  # when: stat_user_fingerprint | failed
+  when: stat_ripasso_cursive_bin.stat.exists == False
 
 - debug:
     var: res_ripasso_build # not required. A variable name to debug.
+  when: stat_ripasso_cursive_bin.stat.exists == False
 
 - name: ensure directories exist
   file:
