@@ -58,14 +58,13 @@
       changed_when: false
   ignore_errors: yes
 
-- name: Generate secret key fingerprint file
-  shell: |
-    pass init "$(cat ~/{{ bossjones__passwordstore__user }}-fingerprint)"
+- name: pass | init
+  shell: "pass init \"$(cat ~/{{ bossjones__passwordstore__user }}-fingerprint)\""
   args:
     chdir: "~"
     executable: /bin/bash
   changed_when: false
-  register: gpg_user_fingerprint
+  register: res_pass_init
   become: yes
   become_user: "{{ bossjones__passwordstore__user }}"
   when: stat_user_fingerprint | failed
