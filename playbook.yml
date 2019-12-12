@@ -73,12 +73,12 @@
     - name: Generate secret key fingerprint file
       shell: "gpg2 --fingerprint {{ bossjones__passwordstore__user }}@localhost | grep -v SCEA | head -1 | awk '{print $9$10}' | tee /home/{{ bossjones__passwordstore__user }}/{{ bossjones__passwordstore__user }}-fingerprint"
       args:
-        chdir: "~"
+        chdir: "~{{bossjones__passwordstore__user}}"
         executable: /bin/bash
       changed_when: false
       register: gpg_user_fingerprint
       become: yes
-      become_user: "{{ gpg_generator_user }}"
+      become_user: "{{ bossjones__passwordstore__user }}"
 
 
 - name: setup password store
