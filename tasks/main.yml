@@ -59,9 +59,9 @@
   changed_when: false
   ignore_errors: yes
 
-- name: "Check if ~/{{ bossjones__passwordstore__user }}/dev/ripasso/target/debug/ripasso-cursive file exists"
+- name: "Check if ~{{ bossjones__passwordstore__user }}/dev/ripasso/target/debug/ripasso-cursive file exists"
   stat:
-    path: "~/{{ bossjones__passwordstore__user }}/dev/ripasso/target/debug/ripasso-cursive"
+    path: "~{{ bossjones__passwordstore__user }}/dev/ripasso/target/debug/ripasso-cursive"
   register: stat_ripasso_cursive_bin
   changed_when: false
   ignore_errors: yes
@@ -126,7 +126,7 @@
   file:
     dest: "~{{ bossjones__passwordstore__user }}/{{ item }}"
     state: directory
-    mode: 0755
+    mode: 0700
   loop:
     - bin
   become: yes
@@ -153,6 +153,17 @@
   changed_when: false
   become: yes
   become_user: "{{ bossjones__passwordstore__user }}"
+  when: bossjones__passwordstore__configure_password_store_docker | bool
+
+- name: docker-credential-pass | download
+  shell: |
+    wget https://github.com/docker/docker-credential-helpers/releases/download/v0.6.3/docker-credential-pass-v0.6.3-amd64.tar.gz -O- | tar xz
+    chmod +x ~/usr/local/bin/docker-credential-pass
+  args:
+    chdir: "/usr/local/bin"
+    executable: /bin/bash
+  changed_when: false
+  become: yes
   when: bossjones__passwordstore__configure_password_store_docker | bool
 
   # wget https://github.com/docker/docker-credential-helpers/releases/download/v0.6.3/docker-credential-pass-v0.6.3-amd64.tar.gz -O- | tar xz
