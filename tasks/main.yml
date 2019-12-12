@@ -52,7 +52,8 @@
 # Password store initialized for 56C83F52
 
 - name: "Check if ~/{{ bossjones__passwordstore__user }}-fingerprint file exists"
-  raw: "stat ~/{{ bossjones__passwordstore__user }}-fingerprint"
+  stat:
+    path: "~/{{ bossjones__passwordstore__user }}-fingerprint"
   register: stat_user_fingerprint
   changed_when: false
   ignore_errors: yes
@@ -66,7 +67,6 @@
   register: res_pass_init
   become: yes
   become_user: "{{ bossjones__passwordstore__user }}"
-  # when: stat_user_fingerprint | failed
   when: stat_user_fingerprint.stat.exists == False
 
 # SOURCE: https://github.com/cortex/ripasso
