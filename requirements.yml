@@ -2,4 +2,5 @@
 - src: https://github.com/bossjones/boss-ansible-role-debug
 # https://github.com/suzuki-shunsuke/ansible-gvm
 - src: https://github.com/bossjones/ansible-role-knownhosts
+- src: https://github.com/bossjones/ansible-role-oh-my-zsh
 - src: https://github.com/juju4/ansible-gpgkey_generate
