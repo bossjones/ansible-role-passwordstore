@@ -119,5 +119,27 @@
     - ../ansible-role-knownhosts
     - ../ansible-role-passwordstore
 
+  post_tasks:
+
+    - name: ensure directories exist
+      file:
+        dest: "~{{ bossjones__passwordstore__user }}/{{ item }}"
+        state: directory
+        mode: 0700
+      loop:
+        - .docker
+      become: yes
+      become_user: "{{ bossjones__passwordstore__user }}"
+
+    - name: "~{{ bossjones__passwordstore__user }}/.docker/config.json"
+      copy:
+        dest: "~{{ bossjones__passwordstore__user }}/.docker/config.json"
+        content: |
+          {
+            "credsStore": "pass"
+          }
+        mode: 0600
+      become: yes
+      become_user: "{{ bossjones__passwordstore__user }}"
 
   # NOTE: don't forget to cat /etc/X11/Xsession.d/90gpg-agent
