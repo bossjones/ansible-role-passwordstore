@@ -22,6 +22,7 @@
     - .ssh
     # - .ssh/keys
     - .gnupg
+    - bin
 
 # - name: copy GPG key for password store
 #   copy:
@@ -112,6 +113,16 @@
 
 - debug:
     var: res_ripasso_build # not required. A variable name to debug.
+
+- name: ensure directories exist
+  file:
+    dest: "~{{ bossjones__passwordstore__user }}/{{ item }}"
+    state: directory
+    mode: 0755
+  loop:
+    - bin
+  become: yes
+  become_user: "{{ bossjones__passwordstore__user }}"
 
 - name: passmenu | download
   shell: |
