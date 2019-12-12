@@ -82,6 +82,8 @@
       - libssl-dev
       - libgpg-error-dev
       - libgpg-error0
+      - libgpgme-dev
+      - libgpgmepp-dev
   become: yes
 
 - name: Clone ripasso
