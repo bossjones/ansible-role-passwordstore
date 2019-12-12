@@ -131,6 +131,7 @@
       become: yes
       become_user: "{{ bossjones__passwordstore__user }}"
 
+    # SOURCE: https://docs.docker.com/engine/reference/commandline/login/
     - name: "~{{ bossjones__passwordstore__user }}/.docker/config.json"
       copy:
         dest: "~{{ bossjones__passwordstore__user }}/.docker/config.json"
