@@ -80,6 +80,8 @@
       - cmake
       - libncurses-dev
       - libssl-dev
+      - libgpg-error-dev
+      - libgpg-error0
   become: yes
 
 - name: Clone ripasso
