@@ -168,3 +168,6 @@
   when: bossjones__passwordstore__configure_password_store_docker | bool
 
   # wget https://github.com/docker/docker-credential-helpers/releases/download/v0.6.3/docker-credential-pass-v0.6.3-amd64.tar.gz -O- | tar xz
+
+
+  # NOTE: install this https://github.com/tadfisher/pass-otp

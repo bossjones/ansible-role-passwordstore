@@ -148,6 +148,7 @@
     - name: "~{{ bossjones__passwordstore__user }}/bin/fzf-drafts"
       copy:
         dest: "~{{ bossjones__passwordstore__user }}/bin/fzf-drafts"
+        mode: 0755
         content: |
           #!/bin/bash
 
@@ -269,7 +270,7 @@
           }
 
           bind -x '"\C-o\C-o": fzf-open'
-        mode: 0755
+
       become: yes
       become_user: "{{ bossjones__passwordstore__user }}"
 
