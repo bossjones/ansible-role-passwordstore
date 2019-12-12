@@ -109,7 +109,8 @@
 
 - name: passmenu | download
   shell: |
-    curl -L 'https://git.zx2c4.com/password-store/plain/contrib/dmenu/passmenu' > /usr/local/bin/passmenu
+    curl -L 'https://git.zx2c4.com/password-store/plain/contrib/dmenu/passmenu' > ~{{ bossjones__passwordstore__user }}/bin/passmenu;
+    chmod +x ~{{ bossjones__passwordstore__user }}/bin/passmenu;
   args:
     executable: /bin/bash
   changed_when: false
