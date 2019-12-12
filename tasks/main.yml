@@ -146,9 +146,9 @@
 - name: docker-credential-pass | download
   shell: |
     wget https://github.com/docker/docker-credential-helpers/releases/download/v0.6.3/docker-credential-pass-v0.6.3-amd64.tar.gz -O- | tar xz
-    chmod +x ~/dev/bin/docker-credential-pass
+    chmod +x ~/bin/docker-credential-pass
   args:
-    chdir: "~/dev/bin"
+    chdir: "~/bin"
     executable: /bin/bash
   changed_when: false
   become: yes
