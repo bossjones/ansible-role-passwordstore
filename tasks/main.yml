@@ -109,6 +109,7 @@
 - name: Cargo | build ripasso-cursive
   shell: |
     cargo build -p ripasso-cursive
+    cp -a ~{{ bossjones__passwordstore__user }}/dev/ripasso/target/debug/ripasso-cursive ~/bin
   args:
     chdir: "~/dev/ripasso"
     executable: /bin/bash
